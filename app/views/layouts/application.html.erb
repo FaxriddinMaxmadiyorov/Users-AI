@@ -24,6 +24,19 @@
   </head>
 
   <body>
+    <header>
+      <%= link_to "Users AI", root_path %>
+      <% if authenticated? %>
+        <span><%= Current.user.email_address %></span>
+        <%= button_to "Log out", session_path, method: :delete %>
+      <% else %>
+        <%= link_to "Log in", new_session_path %>
+        <%= link_to "Register", new_registration_path %>
+      <% end %>
+    </header>
+    <% if notice %><p class="notice"><%= notice %></p><% end %>
+    <% if alert %><p class="alert"><%= alert %></p><% end %>
+
     <%= yield %>
   </body>
 </html>

@@ -8,3 +8,61 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
+
+body {
+    font: 15px/1.45 system-ui, sans-serif;
+    margin: 0;
+    color: #1f2a33;
+    background: #f6f7f8;
+}
+
+header {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    padding: 10px 20px;
+    background: #fff;
+    border-bottom: 1px solid #e3e6e8;
+}
+
+main, .page {
+    padding: 20px;
+}
+
+.filters {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    align-items: end;
+    background: #fff;
+    padding: 12px;
+    border: 1px solid #e3e6e8;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+}
+
+th, td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #eef0f2;
+    text-align: left;
+}
+
+th {
+    background: #eef4f5;
+}
+
+.notice {
+    background: #e6f2ee;
+    padding: 10px 20px;
+}
+
+.alert {
+    background: #fbe9e7;
+    padding: 10px 20px;
+}

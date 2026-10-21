@@ -1,0 +1,30 @@
+<h1>Users (<%= @total %> matching)</h1>
+
+<%= form_with url: users_path, method: :get, class: "filters" do |f| %>
+  <%= f.text_field :query, value: @filters["query"], placeholder: "name or e-mail contains…" %>
+  <%= f.text_field :name_contains, value: @filters["name_contains"], placeholder: "name contains" %>
+  <%= f.text_field :email_starts_with, value: Array(@filters["email_starts_with"]).join(", "), placeholder: "e-mail starts with (s, p)" %>
+  <%= f.text_field :email_domain, value: @filters["email_domain"], placeholder: "domain" %>
+  <%= f.date_field :registered_after, value: @filters["registered_after"] %>
+  <%= f.date_field :registered_before, value: @filters["registered_before"] %>
+  <%= f.select :sort, options_for_select([["Newest", "created_at"], ["Name", "name"], ["E-mail", "email"]], @filters["sort"]) %>
+  <%= f.select :dir, options_for_select([["↓ desc", "desc"], ["↑ asc", "asc"]], @filters["dir"]) %>
+  <%= f.submit "Apply" %>
+  <%= link_to "Clear", users_path %>
+<% end %>
+
+<p><%= @query.describe %></p>
+
+<table>
+  <thead><tr><th>#</th><th>Name</th><th>E-mail</th><th>Registered</th></tr></thead>
+  <tbody>
+    <% @users.each_with_index do |u, i| %>
+      <tr>
+        <td><%= i + 1 %></td>
+        <td><%= u.name %></td>
+        <td><%= u.email_address %></td>
+        <td><%= l u.created_at.to_date %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

@@ -2,8 +2,9 @@ Rails.application.routes.draw do
   resource :session
   resources :passwords, param: :token
   resource :registration, only: %i[new create]
-
-  root "sessions#new"
+  resources :users, only: %i[index]
+  post "assistant", to: "assistant#create"
+  root "users#index"
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
