@@ -92,8 +92,7 @@ production:
   primary: &primary_production
     <<: *default
     database: users_ai_production
-    username: users_ai
-    password: <%= ENV["USERS_AI_DATABASE_PASSWORD"] %>
+    url: <%= ENV.fetch("DATABASE_URL", "") %>
   cache:
     <<: *primary_production
     database: users_ai_production_cache
