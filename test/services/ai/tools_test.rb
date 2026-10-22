@@ -19,7 +19,9 @@ class Ai::ToolsTest < ActiveSupport::TestCase
 
   test "list_users never exposes password_digest" do
     r = Ai::Tools.new.call("list_users", { "limit" => 1 })
-    assert_equal %i[name email registered_at], r[:users].first.keys
+    user = r[:users].first
+    assert_equal %i[name email job status last_seen registered_at], user.keys
+    assert_not user.key?(:password_digest)
   end
 
   test "apply_table_filters records a navigate command" do

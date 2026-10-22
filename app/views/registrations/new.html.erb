@@ -1,18 +1,29 @@
-<h1>Create account</h1>
-<%= form_with model: @user, url: registration_path do |f| %>
-  <% if @user.errors.any? %>
-    <ul>
-      <% @user.errors.full_messages.each do |m| %><li><%= m %></li><% end %>
-    </ul>
+<div class="card narrow">
+  <h1>Create account</h1>
+
+  <%= form_with model: @user, url: registration_path do |f| %>
+    <% if @user.errors.any? %>
+      <ul class="errors">
+        <% @user.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    <% end %>
+
+    <%= f.label :name %>
+    <%= f.text_field :name, required: true, autofocus: true, autocomplete: "name", maxlength: 80 %>
+
+    <%= f.label :email_address, "E-mail" %>
+    <%= f.email_field :email_address, required: true, autocomplete: "username" %>
+
+    <%= f.label :password %>
+    <%= f.password_field :password, required: true, autocomplete: "new-password", minlength: 6, maxlength: 72 %>
+
+    <%= f.label :password_confirmation, "Confirm password" %>
+    <%= f.password_field :password_confirmation, required: true, autocomplete: "new-password", minlength: 6, maxlength: 72 %>
+
+    <%= f.submit "Register", class: "btn" %>
   <% end %>
-  <%= f.label :name %>
-  <%= f.text_field :name, required: true, autofocus: true %>
-  <%= f.label :email_address, "E-mail" %>
-  <%= f.email_field :email_address, required: true, autocomplete: "username" %>
-  <%= f.label :password %>
-  <%= f.password_field :password, required: true, autocomplete: "new-password", minlength: 6 %>
-  <%= f.label :password_confirmation, "Confirm password" %>
-  <%= f.password_field :password_confirmation, required: true, autocomplete: "new-password" %>
-  <%= f.submit "Register" %>
-<% end %>
-<p>Already registered? <%= link_to "Log in", new_session_path %></p>
+
+  <p class="muted">Already registered? <%= link_to "Log in", new_session_path %></p>
+</div>

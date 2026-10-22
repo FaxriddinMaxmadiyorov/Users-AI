@@ -3,7 +3,7 @@ require "test_helper"
 class Ai::AssistantTest < ActiveSupport::TestCase
   class FakeGemini
     def initialize(*responses) = @responses = responses
-    def generate(**) = { "candidates" => [{ "content" => { "parts" => @responses.shift } }] }
+    def generate(**) = { "candidates" => [ { "content" => { "parts" => @responses.shift } } ] }
   end
 
   setup do
@@ -14,8 +14,8 @@ class Ai::AssistantTest < ActiveSupport::TestCase
 
   test "runs the tool loop and returns the final text" do
     client = FakeGemini.new(
-      [{ "functionCall" => { "name" => "count_users", "args" => { "filters" => { "email_starts_with" => ["s"] } } } }],
-      [{ "text" => "There is 1 such user." }]
+      [ { "functionCall" => { "name" => "count_users", "args" => { "filters" => { "email_starts_with" => [ "s" ] } } } } ],
+      [ { "text" => "There is 1 such user." } ]
     )
     r = Ai::Assistant.new(client: client).ask("how many start with s?")
     assert_equal "There is 1 such user.", r[:answer]
@@ -26,15 +26,15 @@ class Ai::AssistantTest < ActiveSupport::TestCase
 
   test "ui tool produces a command" do
     client = FakeGemini.new(
-      [{ "functionCall" => { "name" => "clear_table_filters", "args" => {} } }],
-      [{ "text" => "Cleared." }]
+      [ { "functionCall" => { "name" => "clear_table_filters", "args" => {} } } ],
+      [ { "text" => "Cleared." } ]
     )
     r = Ai::Assistant.new(client: client).ask("clear filters")
     assert_equal({ type: "navigate", filters: {} }, r[:command])
   end
 
   test "stops after MAX_STEPS" do
-    loop_forever = Array.new(10) { [{ "functionCall" => { "name" => "get_table_state", "args" => {} } }] }
+    loop_forever = Array.new(10) { [ { "functionCall" => { "name" => "get_table_state", "args" => {} } } ] }
     r = Ai::Assistant.new(client: FakeGemini.new(*loop_forever)).ask("loop")
     assert_match(/could not finish/, r[:answer])
   end

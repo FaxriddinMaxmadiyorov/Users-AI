@@ -29,8 +29,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_21_113525) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "name", default: "", null: false
+    t.string "status", default: "active", null: false
+    t.string "job_position"
+    t.datetime "last_seen"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
+    t.index ["last_seen"], name: "index_users_on_last_seen"
     t.index ["name"], name: "index_users_on_name"
+    t.index ["status"], name: "index_users_on_status"
   end
 
   add_foreign_key "sessions", "users"

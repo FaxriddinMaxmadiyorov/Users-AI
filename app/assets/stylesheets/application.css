@@ -1,115 +1,59 @@
-/*
- * This is a manifest file that'll be compiled into application.css.
- *
- * With Propshaft, assets are served efficiently without preprocessing steps. You can still include
- * application-wide styles in this file, but keep in mind that CSS precedence will follow the standard
- * cascading order, meaning styles declared later in the document or manifest will override earlier ones,
- * depending on specificity.
- *
- * Consider organizing styles into separate files for maintainability.
- */
+* { box-sizing: border-box; }
+body { margin: 0; font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #1f2a33; background: #f6f7f8; }
+a { color: #1c6b74; }
+h1 { font-size: 24px; margin: 0 0 16px; }
+h1 small { font-weight: 400; color: #6b7486; font-size: 16px; }
+.muted { color: #6b7486; }
 
-body {
-    font: 15px/1.45 system-ui, sans-serif;
-    margin: 0;
-    color: #1f2a33;
-    background: #f6f7f8;
-}
+header { display: flex; align-items: center; gap: 16px; padding: 10px 20px; background: #fff; border-bottom: 1px solid #e3e6e8; }
+header a:first-child { font-weight: 700; text-decoration: none; margin-right: auto; }
+header form { margin: 0; }
 
-header {
-    display: flex;
-    gap: 14px;
-    align-items: center;
-    padding: 10px 20px;
-    background: #fff;
-    border-bottom: 1px solid #e3e6e8;
-}
+.notice, .alert { margin: 12px 20px 0; padding: 10px 14px; border-radius: 6px; }
+.notice { background: #e6f2ee; } .alert { background: #fbe9e7; }
 
-main, .page {
-    padding: 20px;
-}
+.page { display: grid; grid-template-columns: 1fr; gap: 20px; padding: 20px; }
+.page.with-assistant { grid-template-columns: 1fr 360px; }
+@media (max-width: 900px) { .page.with-assistant { grid-template-columns: 1fr; } }
+main { min-width: 0; }
 
-.filters {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    align-items: end;
-    background: #fff;
-    padding: 12px;
-    border: 1px solid #e3e6e8;
-    border-radius: 8px;
-    margin-bottom: 12px;
-}
+.card { background: #fff; border: 1px solid #e3e6e8; border-radius: 8px; padding: 24px; }
+.narrow { max-width: 420px; margin: 40px auto; }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #fff;
+label { display: block; margin-top: 12px; font-weight: 600; }
+input[type=text], input[type=email], input[type=password], input[type=date], select {
+  width: 100%; padding: 8px 10px; border: 1px solid #cfd5d9; border-radius: 6px; margin-top: 4px; font: inherit; background: #fff;
 }
+.btn, input[type=submit], button {
+  display: inline-block; margin-top: 12px; padding: 8px 14px; background: #1c6b74; color: #fff; border: 0; border-radius: 6px; cursor: pointer; font: inherit;
+}
+header button { margin: 0; padding: 6px 10px; }
+ul { padding-left: 18px; }
 
-th, td {
-    padding: 8px 10px;
-    border-bottom: 1px solid #eef0f2;
-    text-align: left;
-}
+.filters { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; align-items: end; background: #fff; padding: 12px; border: 1px solid #e3e6e8; border-radius: 8px; margin-bottom: 12px; }
+.filters input, .filters select { margin-top: 0; }
+.filters input[type=submit] { margin-top: 0; }
+.filters a { align-self: center; }
 
-th {
-    background: #eef4f5;
-}
+table.users { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #e3e6e8; }
+table.users th, table.users td { padding: 8px 10px; border-bottom: 1px solid #eef0f2; text-align: left; }
+table.users th { background: #eef4f5; }
 
-.notice {
-    background: #e6f2ee;
-    padding: 10px 20px;
-}
-
-.alert {
-    background: #fbe9e7;
-    padding: 10px 20px;
-}
-
-.page.with-assistant {
-    display: grid;
-    grid-template-columns: 1fr 360px;
-    gap: 20px;
-}
-
-.assistant {
-    background: #fff;
-    border: 1px solid #e3e6e8;
-    border-radius: 8px;
-    padding: 14px;
-    position: sticky;
-    top: 20px;
-    align-self: start;
-}
-
-.assistant .log {
-    height: 360px;
-    overflow-y: auto;
-    border: 1px solid #eef0f2;
-    padding: 8px;
-    margin: 8px 0;
-    background: #fafbfb;
-}
-
-.assistant .msg {
-    margin: 6px 0;
-    padding: 8px 10px;
-    border-radius: 8px;
-    white-space: pre-wrap;
-}
-
-.assistant .msg.user {
-    background: #e6f2ee;
-    margin-left: 30px;
-}
-
-.assistant .msg.assistant {
-    background: #eef4f5;
-    margin-right: 30px;
-}
-
-.assistant form {
-    display: flex;
-    gap: 6px;
-}
+.assistant { background: #fff; border: 1px solid #e3e6e8; border-radius: 8px; padding: 14px; position: sticky; top: 20px; align-self: start; }
+.assistant h2 { margin: 0 0 8px; font-size: 18px; }
+.assistant .log { height: 360px; overflow-y: auto; border: 1px solid #eef0f2; border-radius: 6px; padding: 8px; background: #fafbfb; margin-bottom: 8px; }
+.assistant .msg { margin: 6px 0; padding: 8px 10px; border-radius: 8px; white-space: pre-wrap; }
+.assistant .msg.user { background: #e6f2ee; margin-left: 30px; }
+.assistant .msg.assistant { background: #eef4f5; margin-right: 30px; }
+.assistant form { display: flex; gap: 6px; }
+.assistant form input { margin: 0; }
+.assistant form button { margin: 0; }
+.toolbar { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+.toolbar .btn { margin-top: 0; }
+.btn-danger { background: #b04a33; }
+tr.blocked td { color: #8a93a3; }
+tr.current td { background: #fbf7ea; }
+.status { padding: 2px 8px; border-radius: 10px; font-size: 13px; }
+.status.active { background: #e6f2ee; color: #1c6b74; }
+.status.blocked { background: #fbe9e7; color: #b04a33; }
+.sort { display: flex; gap: 6px; }

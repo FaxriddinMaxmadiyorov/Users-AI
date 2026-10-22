@@ -18,7 +18,15 @@ module Authentication
     end
 
     def require_authentication
-      resume_session || request_authentication
+      resume_session
+
+      if Current.user.nil?
+        cookies.delete(:session_id)
+        request_authentication
+      elsif Current.user.blocked?
+        terminate_session
+        redirect_to new_session_path, alert: "Your account is blocked."
+      end
     end
 
     def resume_session

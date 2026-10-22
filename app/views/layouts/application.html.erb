@@ -34,8 +34,9 @@
         <%= link_to "Register", new_registration_path %>
       <% end %>
     </header>
-    <% if notice %><p class="notice"><%= notice %></p><% end %>
-    <% if alert %><p class="alert"><%= alert %></p><% end %>
+
+    <% if notice %><div class="notice"><%= notice %></div><% end %>
+    <% if alert %><div class="alert"><%= alert %></div><% end %>
 
     <div class="page <%= authenticated? ? "with-assistant" : "" %>">
       <main><%= yield %></main>
