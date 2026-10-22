@@ -9,7 +9,7 @@ class AssistantController < ApplicationController
                 .select { |m| %w[user assistant].include?(m[:role]) }
 
     render json: Ai::Assistant.new.ask(message, history: history)
-  rescue Faraday::Error, OpenAI::Error => e
+  rescue Ai::GeminiClient::Error, Net::OpenTimeout, Net::ReadTimeout => e
     render json: { error: "AI provider error: #{e.message}" }, status: :bad_gateway
   end
 end

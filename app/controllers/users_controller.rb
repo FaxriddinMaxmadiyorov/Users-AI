@@ -1,8 +1,6 @@
 class UsersController < ApplicationController
   def index
-    @filters = UserQuery.permit(params)
-    @query   = UserQuery.new(@filters)
-    @users   = @query.relation.limit(200)
-    @total   = @query.count
+    current = UserQuery.permit(params[:current_filters] || {})
+    render json: Ai::Assistant.new(current_filters: current).ask(message, history: history)
   end
 end

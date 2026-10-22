@@ -2,7 +2,6 @@ module Ai
   module FilterSchema
     FILTERS = {
       type: "object",
-      additionalProperties: false,
       properties: {
         query:             { type: "string", description: "Substring matched against name OR e-mail (case-insensitive)." },
         name_contains:     { type: "string", description: "Substring that must appear in the name." },

@@ -1,0 +1,12 @@
+<aside class="assistant"
+       data-controller="assistant"
+       data-assistant-url-value="<%= assistant_path %>"
+       data-assistant-users-url-value="<%= users_path %>"
+       data-assistant-filters-value="<%= (@filters || {}).to_json %>">
+  <h2>Assistant</h2>
+  <div class="log" data-assistant-target="log"></div>
+  <form data-action="submit->assistant#send">
+    <input type="text" data-assistant-target="input" placeholder="e.g. show users with e-mails starting with s or p" autocomplete="off">
+    <button data-assistant-target="button">Send</button>
+  </form>
+</aside>

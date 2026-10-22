@@ -3,50 +3,45 @@ module Ai
     MAX_LIST = 50
 
     DEFINITIONS = [
-      {
-        type: "function",
-        function: {
-          name: "count_users",
-          description: "Exact number of users matching the filters. Use for 'how many' questions.",
-          parameters: { type: "object", properties: { filters: FilterSchema::FILTERS } }
-        }
-      },
-      {
-        type: "function",
-        function: {
-          name: "list_users",
-          description: "List users matching the filters (name, e-mail, registration date). Max #{MAX_LIST} rows; total count is also returned.",
-          parameters: {
-            type: "object",
-            properties: { filters: FilterSchema::FILTERS, limit: { type: "integer", minimum: 1, maximum: MAX_LIST } }
-          }
-        }
-      },
-      {
-        type: "function",
-        function: {
-          name: "aggregate_users",
-          description: "Group matching users and count per group. Use for 'most common domain', 'registrations per month', 'first letter' questions.",
-          parameters: {
-            type: "object",
-            properties: {
-              group_by: { type: "string", enum: %w[email_domain registration_month registration_year email_first_letter name_first_letter] },
-              filters: FilterSchema::FILTERS,
-              limit: { type: "integer", minimum: 1, maximum: 50 }
-            },
-            required: ["group_by"]
-          }
-        }
-      },
-      {
-        type: "function",
-        function: {
-          name: "find_user",
-          description: "Fetch one user by exact e-mail address.",
-          parameters: { type: "object", properties: { email: { type: "string" } }, required: ["email"] }
-        }
-      }
+        { name: "count_users",
+            description: "Exact number of users matching the filters. Use for 'how many' questions.",
+            parameters: { type: "object", properties: { filters: FilterSchema::FILTERS } } },
+        { name: "list_users",
+            description: "List users matching the filters. Max #{MAX_LIST} rows; total count is also returned.",
+            parameters: { type: "object", properties: { filters: FilterSchema::FILTERS, limit: { type: "integer", description: "1..#{MAX_LIST}" } } } },
+        { name: "aggregate_users",
+            description: "Group matching users and count per group. Use for 'most common domain', 'registrations per month', 'first letter' questions.",
+            parameters: { type: "object",
+                        properties: { group_by: { type: "string", enum: %w[email_domain registration_month registration_year email_first_letter name_first_letter] },
+                                        filters: FilterSchema::FILTERS,
+                                        limit: { type: "integer", description: "1..50" } },
+                        required: ["group_by"] } },
+        { name: "find_user",
+            description: "Fetch one user by exact e-mail address.",
+            parameters: { type: "object", properties: { email: { type: "string" } }, required: ["email"] } },
+        { name: "get_table_state",
+          description: "Current filters and sort of the Users table the person is looking at.",
+          parameters: { type: "object", properties: {} } },
+        { name: "apply_table_filters",
+          description: "Change what the Users table shows. Pass the COMPLETE desired filter set (it replaces the current one). To add a condition to the current view, call get_table_state first and include the existing filters. Use for 'show only…', 'filter…', 'select users with…', 'hide…'.",
+          parameters: { type: "object", properties: { filters: FilterSchema::FILTERS }, required: ["filters"] } },
+        { name: "sort_table",
+          description: "Sort the Users table, keeping current filters.",
+          parameters: { type: "object",
+                        properties: { sort: { type: "string", enum: %w[name email created_at] }, dir: { type: "string", enum: %w[asc desc] } },
+                        required: ["sort"] } },
+        { name: "clear_table_filters",
+          description: "Reset the Users table to show all users with default sort.",
+          parameters: { type: "object", properties: {} } }
     ].freeze
+
+    attr_reader :ui_command
+
+    def initialize(current_filters: {})
+      @tools  = Tools.new(current_filters: current_filters)
+      @current_filters = UserQuery.permit(current_filters)
+      @ui_command = nil
+    end
 
     def call(name, args)
       args = (args || {}).to_h.transform_keys(&:to_s)
@@ -55,6 +50,10 @@ module Ai
       when "list_users"      then list_users(args["filters"], args["limit"])
       when "aggregate_users" then aggregate_users(args["group_by"], args["filters"], args["limit"])
       when "find_user"       then find_user(args["email"])
+      when "get_table_state"     then table_state
+      when "apply_table_filters" then apply_table_filters(args["filters"])
+      when "sort_table"          then sort_table(args["sort"], args["dir"])
+      when "clear_table_filters" then clear_table_filters
       else { error: "unknown tool #{name}" }
       end
     end
@@ -100,6 +99,33 @@ module Ai
 
     def serialize(u)
       { name: u.name, email: u.email_address, registered_at: u.created_at.to_date.iso8601 }
+    end
+
+    def table_state
+      q = query(@current_filters)
+      { filters: @current_filters, description: q.describe, matching_count: q.count }
+    end
+
+    def apply_table_filters(filters)
+      f = UserQuery.permit(filters || {})
+      q = query(f)
+      @ui_command = { type: "navigate", filters: f }
+      { applied: true, filters: f, description: q.describe, matching_count: q.count }
+    end
+
+    def sort_table(sort, dir)
+      f = @current_filters.merge("sort" => sort, "dir" => dir || "asc")
+      @ui_command = { type: "navigate", filters: f }
+      { applied: true, filters: f, description: query(f).describe }
+    end
+
+    def clear_table_filters
+      @ui_command = { type: "navigate", filters: {} }
+      { applied: true, matching_count: User.count }
+    end
+
+    def finish(answer, trace)
+      { answer: answer.presence || "Done.", command: @tools.ui_command, tool_calls: trace }
     end
   end
 end
