@@ -1,30 +1,75 @@
-<h1>Users (<%= @total %> matching)</h1>
+<h1>Users <small>(<%= @total %> matching)</small></h1>
 
 <%= form_with url: users_path, method: :get, class: "filters" do |f| %>
-  <%= f.text_field :query, value: @filters["query"], placeholder: "name or e-mail contains…" %>
-  <%= f.text_field :name_contains, value: @filters["name_contains"], placeholder: "name contains" %>
+  <%= f.text_field :query, value: @filters["query"], placeholder: "name, e-mail or job contains…" %>
   <%= f.text_field :email_starts_with, value: Array(@filters["email_starts_with"]).join(", "), placeholder: "e-mail starts with (s, p)" %>
-  <%= f.text_field :email_domain, value: @filters["email_domain"], placeholder: "domain" %>
-  <%= f.date_field :registered_after, value: @filters["registered_after"] %>
-  <%= f.date_field :registered_before, value: @filters["registered_before"] %>
-  <%= f.select :sort, options_for_select([["Newest", "created_at"], ["Name", "name"], ["E-mail", "email"]], @filters["sort"]) %>
-  <%= f.select :dir, options_for_select([["↓ desc", "desc"], ["↑ asc", "asc"]], @filters["dir"]) %>
+  <%= f.text_field :email_domain, value: @filters["email_domain"], placeholder: "e-mail domain" %>
+  <%= f.text_field :job_contains, value: @filters["job_contains"], placeholder: "job contains" %>
+
+  <%= f.date_field :seen_after,  value: @filters["seen_after"],  title: "Last seen on or after" %>
+  <%= f.date_field :seen_before, value: @filters["seen_before"], title: "Last seen before" %>
+  <%= f.select :status, options_for_select([["Any status", ""], ["Active", "active"], ["Blocked", "blocked"]], @filters["status"]) %>
+  <div class="sort">
+    <%= f.select :sort, options_for_select([["Last seen", "last_seen"], ["Name", "name"], ["E-mail", "email"], ["Job", "job"], ["Registered", "created_at"]], @filters["sort"]) %>
+    <%= f.select :dir,  options_for_select([["Desc", "desc"], ["Asc", "asc"]], @filters["dir"]) %>
+  </div>
+
   <%= f.submit "Apply" %>
   <%= link_to "Clear", users_path %>
 <% end %>
 
-<p><%= @query.describe %></p>
+<p class="muted">Showing: <%= @query.describe %></p>
 
-<table>
-  <thead><tr><th>#</th><th>Name</th><th>E-mail</th><th>Registered</th></tr></thead>
-  <tbody>
-    <% @users.each_with_index do |u, i| %>
+<%= form_with url: block_users_path, method: :post, html: { data: { controller: "selection" } } do %>
+  <div class="toolbar">
+    <%= button_tag "Block",   name: "_method", value: "patch",  formaction: block_users_path,   class: "btn" %>
+    <%= button_tag "Unblock", name: "_method", value: "patch",  formaction: unblock_users_path, class: "btn" %>
+    <%= button_tag "Delete",  name: "_method", value: "delete", formaction: destroy_selected_users_path, class: "btn btn-danger",
+                   data: { turbo_confirm: "Delete selected users? This cannot be undone." } %>
+    <span class="muted" data-selection-target="count"></span>
+  </div>
+
+  <table class="users">
+    <thead>
       <tr>
-        <td><%= i + 1 %></td>
-        <td><%= u.name %></td>
-        <td><%= u.email_address %></td>
-        <td><%= l u.created_at.to_date %></td>
+        <th>
+          <%= check_box_tag "select_all", "1", false,
+                data: { selection_target: "all", action: "change->selection#toggleAll" } %>
+        </th>
+        <th>#</th>
+        <th>Name</th>
+        <th>E-mail</th>
+        <th>Job</th>
+        <th>Last seen</th>
+        <th>Status</th>
       </tr>
-    <% end %>
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      <% @users.each.with_index(1) do |user, i| %>
+        <tr class="<%= class_names(blocked: user.blocked?, current: user == Current.user) %>">
+          <td>
+            <%= check_box_tag "user_ids[]", user.id, false, id: "user_#{user.id}",
+                  data: { selection_target: "item", action: "change->selection#update" } %>
+          </td>
+          <td><%= i %></td>
+          <td>
+            <%= user.name %>
+            <% if user == Current.user %><span class="muted">(you)</span><% end %>
+          </td>
+          <td><%= user.email_address %></td>
+          <td><%= user.job_position %></td>
+          <td><%= user.last_seen ? l(user.last_seen, format: :short) : "–" %></td>
+          <td><span class="status <%= user.status %>"><%= user.status %></span></td>
+        </tr>
+      <% end %>
+
+      <% if @users.empty? %>
+        <tr><td colspan="7" class="muted">No users match the current filters.</td></tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<% if @total > @users.size %>
+  <p class="muted">Showing the first <%= @users.size %> of <%= @total %>. Narrow the filters to see the rest.</p>
+<% end %>
