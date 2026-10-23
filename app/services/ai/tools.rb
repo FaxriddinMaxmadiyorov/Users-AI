@@ -3,7 +3,7 @@ module Ai
   # UI tools do not query anything: they produce a command the browser applies to the table.
   class Tools
     MAX_LIST = 50
-    GROUPS   = %w[status job_position email_domain last_seen_month registration_month email_first_letter name_first_letter].freeze
+    GROUPS = %w[status job_position email_domain email_tld last_seen_month registration_month email_first_letter name_first_letter].freeze
 
     DEFINITIONS = [
       {
@@ -117,6 +117,7 @@ module Ai
         when "status"             then "users.status"
         when "job_position"       then "users.job_position"
         when "email_domain"       then "split_part(users.email_address, '@', 2)"
+        when "email_tld"          then "substring(users.email_address from '\\.([^.]+)$')"
         when "last_seen_month"    then "to_char(users.last_seen, 'YYYY-MM')"
         when "registration_month" then "to_char(users.created_at, 'YYYY-MM')"
         when "email_first_letter" then "left(users.email_address, 1)"

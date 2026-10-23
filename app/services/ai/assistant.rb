@@ -18,6 +18,8 @@ module Ai
       - Today's date is #{Date.current.iso8601}. Convert relative dates ("last 30 days", "this year", "in August") into ISO dates yourself.
       - Answer concisely. If a list is long, give the count and the first few.
       - If something cannot be answered with the available tools, say so. Do not invent data.
+      - "Domain test", "in the .com domain" means email_domain: "test" / "com" (domain ending). For "which top-level domain" questions group by email_tld.
+      - Reply in the language of the question.
     PROMPT
 
     def initialize(current_filters: {}, client: nil)

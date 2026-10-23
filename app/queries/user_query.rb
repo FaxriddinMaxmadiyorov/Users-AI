@@ -35,6 +35,7 @@ class UserQuery
     h = params.respond_to?(:to_unsafe_h) ? params.to_unsafe_h : params.to_h
     h = h.to_h.transform_keys(&:to_s).slice(*FILTER_KEYS)
     h["email_starts_with"] = normalize_list(h["email_starts_with"])
+    h["email_domain"] = h["email_domain"].to_s.strip.downcase.delete_prefix("@").delete_prefix(".") if h.key?("email_domain")
     h.delete("status") unless STATUSES.include?(h["status"])
     h.delete("sort")   unless SORTS.key?(h["sort"])
     h.delete("dir")    unless %w[asc desc].include?(h["dir"])
@@ -76,8 +77,10 @@ class UserQuery
     if f["email_contains"].present?
       rel = rel.where("users.email_address LIKE ?", "%#{like(f["email_contains"])}%")
     end
-    if f["email_domain"].present?
-      rel = rel.where("users.email_address LIKE ?", "%@#{like(f["email_domain"])}")
+    if (domain = f["email_domain"]).present?
+      # "satterfield.test" (exact domain) or "test" / "com" (any domain ending with it)
+      rel = rel.where("users.email_address LIKE ? OR users.email_address LIKE ?",
+                      "%@#{like(domain)}", "%.#{like(domain)}")
     end
 
     if f["job_contains"].present?
@@ -127,7 +130,7 @@ class UserQuery
     parts << "name starts with \"#{f["name_starts_with"]}\"" if f["name_starts_with"]
     parts << "e-mail starts with #{f["email_starts_with"].map { |p| "\"#{p}\"" }.join(" or ")}" if f["email_starts_with"]
     parts << "e-mail contains \"#{f["email_contains"]}\"" if f["email_contains"]
-    parts << "e-mail domain is #{f["email_domain"]}" if f["email_domain"]
+    parts << "e-mail domain is #{f["email_domain"]} or ends with .#{f["email_domain"]}" if f["email_domain"]
     parts << "job contains \"#{f["job_contains"]}\"" if f["job_contains"]
     parts << "status is #{f["status"]}" if f["status"]
     parts << "last seen on or after #{f["seen_after"]}" if f["seen_after"]

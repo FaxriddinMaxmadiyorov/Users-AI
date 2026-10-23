@@ -60,4 +60,13 @@ class UserQueryTest < ActiveSupport::TestCase
   test "LIKE wildcards in input are escaped" do
     assert_equal 0, UserQuery.new("name_contains" => "%").count
   end
+
+  test "email_domain matches exact domain and domain ending" do
+    User.create!(name: "T", email_address: "x@satterfield.test", password: "p")
+    assert_equal 1, UserQuery.new("email_domain" => "test").count
+    assert_equal 1, UserQuery.new("email_domain" => ".test").count
+    assert_equal 1, UserQuery.new("email_domain" => "satterfield.test").count
+    assert_equal 2, UserQuery.new("email_domain" => "gmail.com").count
+    assert_equal 2, UserQuery.new("email_domain" => "com").count
+  end
 end

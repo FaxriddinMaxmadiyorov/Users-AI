@@ -11,7 +11,7 @@ module Ai
         email_starts_with: { type: "array", items: { type: "string" },
                              description: "Allowed first letters/prefixes of the e-mail (OR). Example: [\"s\",\"p\"]." },
         email_contains:    { type: "string", description: "Substring that must appear in the e-mail." },
-        email_domain:      { type: "string", description: "Exact e-mail domain, e.g. gmail.com." },
+        email_domain:      { type: "string", description: "E-mail domain or its ending. \"gmail.com\" matches exactly that domain; \"test\" or \"com\" matches every domain ending in .test / .com. Pass it without @." },
         job_contains:      { type: "string", description: "Substring that must appear in the job position, e.g. \"Banking\"." },
         status:            { type: "string", enum: %w[active blocked], description: "Account status." },
         seen_after:        { type: "string", description: "ISO date YYYY-MM-DD. Users last seen on/after this day." },
